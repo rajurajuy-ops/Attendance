@@ -1,0 +1,1273 @@
+<style>
+  :root{
+    --ink:#202A25;
+    --paper:#EEF0EC;
+    --paper-raised:#F7F8F5;
+    --line:#D6DACF;
+    --brass:#C98A2C;
+    --brass-dark:#A9701E;
+    --present:#3F7D58;
+    --absent:#B23B3B;
+    --late:#C98A2C;
+    --leave:#3B6EA8;
+    --wfh:#6B4E9B;
+    --halfday:#C77A34;
+    --holiday:#8B9389;
+    --weekoff:#B7BDB2;
+    --muted:#6B7268;
+  }
+  *{box-sizing:border-box;}
+  .ams{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    min-height:600px;
+    border-radius:10px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    font-size:14px;
+    line-height:1.45;
+  }
+  .ams h1,.ams h2,.ams h3{
+    font-family:'Lora',Georgia,serif;
+    font-weight:600;
+    margin:0;
+  }
+  .ams-clock{ font-family:'IBM Plex Mono',monospace; }
+  button{ font-family:inherit; cursor:pointer; }
+  input,select{ font-family:inherit; }
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    display:flex; align-items:center; justify-content:center;
+    min-height:600px; width:100%;
+    background:linear-gradient(180deg,#1B2420 0%, #202A25 100%);
+  }
+  .login-card{
+    width:380px; background:var(--paper-raised); border-radius:8px;
+    padding:36px 32px; box-shadow:0 20px 60px rgba(0,0,0,.35);
+    border-top:4px solid var(--brass);
+  }
+  .login-card-wide{ width:420px; max-height:88vh; overflow-y:auto; }
+  .login-card .field label{ font-size:11.5px; }
+  .login-error{ color:var(--absent); font-size:12px; margin:-6px 0 12px; }
+  .login-card h1{ font-size:22px; margin-bottom:4px; }
+  .login-sub{ color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .role-pick{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .role-btn{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; border:1px solid var(--line); border-radius:6px;
+    background:#fff; text-align:left;
+  }
+  .role-btn:hover{ border-color:var(--brass); }
+  .role-btn.active{ border-color:var(--brass); background:#FBF3E4; }
+  .role-btn .rname{ font-weight:600; }
+  .role-btn .rmeta{ font-size:12px; color:var(--muted); }
+  .login-go{
+    width:100%; padding:11px; background:var(--ink); color:#fff; border:none;
+    border-radius:6px; font-weight:600; font-size:14px;
+  }
+  .login-go:hover{ background:#111815; }
+  .login-note{ margin-top:16px; font-size:11.5px; color:var(--muted); line-height:1.5; }
+
+  /* ---------- App shell ---------- */
+  .app-shell{ display:flex; flex:1; min-height:600px; }
+  .sidebar{
+    width:196px; background:var(--ink); color:#DDE3DA; flex-shrink:0;
+    display:flex; flex-direction:column; padding:18px 0;
+  }
+  .brand{ padding:0 18px 16px; border-bottom:1px solid rgba(255,255,255,.1); margin-bottom:10px;}
+  .brand-name{ font-family:'Lora',serif; font-size:16px; font-weight:600; color:#fff; }
+  .brand-tag{ font-size:10.5px; color:var(--brass); margin-top:2px; }
+  .nav-item{
+    display:flex; align-items:center; gap:9px; padding:9px 18px; font-size:13px;
+    color:#C4CCC0; border-left:3px solid transparent; background:none; border-top:none; border-right:none; border-bottom:none; width:100%; text-align:left;
+  }
+  .nav-item:hover{ background:rgba(255,255,255,.05); color:#fff; }
+  .nav-item.active{ border-left-color:var(--brass); background:rgba(255,255,255,.07); color:#fff; }
+  .nav-spacer{ flex:1; }
+  .nav-user{ padding:12px 18px; border-top:1px solid rgba(255,255,255,.1); font-size:12px; }
+  .nav-user .u-name{ color:#fff; font-weight:600; }
+  .nav-user .u-role{ color:var(--brass); font-size:11px; }
+  .logout-btn{ margin-top:8px; font-size:11.5px; color:#C4CCC0; background:none; border:none; padding:0; text-decoration:underline; }
+
+  .main{ flex:1; overflow-y:auto; padding:22px 28px; background:var(--paper); }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .topbar h1{ font-size:20px; }
+  .topbar-sub{ color:var(--muted); font-size:12.5px; margin-top:2px; }
+  .btn{
+    padding:8px 14px; border-radius:6px; border:1px solid var(--line); background:#fff;
+    font-size:13px; font-weight:500; color:var(--ink);
+  }
+  .btn:hover{ border-color:var(--brass); }
+  .btn-primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .btn-primary:hover{ background:#111815; }
+  .btn-brass{ background:var(--brass); color:#fff; border-color:var(--brass); }
+  .btn-brass:hover{ background:var(--brass-dark); }
+  .btn-danger{ color:var(--absent); border-color:var(--absent); background:#fff; }
+  .btn-sm{ padding:5px 10px; font-size:12px; }
+
+  /* cards / grid */
+  .grid{ display:grid; gap:14px; }
+  .grid-6{ grid-template-columns:repeat(6,1fr); }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  .grid-2{ grid-template-columns:2fr 1fr; }
+  @media(max-width:900px){ .grid-6{grid-template-columns:repeat(3,1fr);} .grid-2{grid-template-columns:1fr;} }
+
+  .card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:8px; padding:16px; }
+  .stat-card .stat-num{ font-family:'Lora',serif; font-size:26px; font-weight:600; }
+  .stat-card .stat-label{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .stat-card{ border-top:3px solid var(--line); }
+  .stat-present{ border-top-color:var(--present); }
+  .stat-absent{ border-top-color:var(--absent); }
+  .stat-late{ border-top-color:var(--late); }
+  .stat-leave{ border-top-color:var(--leave); }
+  .stat-wfh{ border-top-color:var(--wfh); }
+  .stat-pct{ border-top-color:var(--ink); }
+
+  /* punch clock hero */
+  .punch-hero{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#fff; border-radius:8px; padding:20px 24px; margin-bottom:18px;
+  }
+  .punch-time{ font-family:'IBM Plex Mono',monospace; font-size:34px; letter-spacing:1px; }
+  .punch-date{ font-size:12.5px; color:#B9C1B4; margin-top:2px; }
+  .punch-status{ font-size:12.5px; color:#B9C1B4; margin-top:6px; }
+  .punch-status b{ color:var(--brass); }
+  .punch-btn{
+    padding:14px 26px; border-radius:7px; border:none; font-size:15px; font-weight:600;
+  }
+  .punch-in{ background:var(--present); color:#fff; }
+  .punch-out{ background:var(--brass); color:#fff; }
+  .punch-done{ background:#39443C; color:#8FA089; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  th{ text-align:left; padding:8px 10px; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); border-bottom:1px solid var(--line); }
+  td{ padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tr:hover td{ background:rgba(0,0,0,.015); }
+
+  .pill{ display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:600; color:#fff; }
+  .pill-PRESENT{ background:var(--present); }
+  .pill-ABSENT{ background:var(--absent); }
+  .pill-LATE{ background:var(--late); }
+  .pill-HALF_DAY{ background:var(--halfday); }
+  .pill-ON_LEAVE{ background:var(--leave); }
+  .pill-WFH{ background:var(--wfh); }
+  .pill-HOLIDAY{ background:var(--holiday); }
+  .pill-WEEK_OFF{ background:var(--weekoff); color:var(--ink); }
+  .pill-PENDING{ background:#E8D9AE; color:#7A5B12; }
+  .pill-APPROVED{ background:var(--present); }
+  .pill-REJECTED{ background:var(--absent); }
+  .pill-locked{ background:#3A3F3A; }
+
+  .filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .filters select,.filters input{ padding:7px 9px; border:1px solid var(--line); border-radius:6px; font-size:12.5px; background:#fff; }
+
+  .section-title{ font-size:14px; font-weight:600; margin-bottom:10px; }
+  .empty{ text-align:center; color:var(--muted); padding:30px 10px; font-size:13px; }
+
+  .modal-bg{ position:fixed; inset:0; background:rgba(20,24,20,.5); display:flex; align-items:center; justify-content:center; z-index:50; }
+  .modal{ background:#fff; border-radius:8px; padding:22px; width:420px; max-width:92vw; max-height:85vh; overflow-y:auto; }
+  .modal h3{ font-size:16px; margin-bottom:14px; }
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  .field input,.field select,.field textarea{ width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font-size:13px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+
+  .toast{ position:fixed; bottom:20px; right:20px; background:var(--ink); color:#fff; padding:11px 18px; border-radius:6px; font-size:13px; z-index:60; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+  .cal-dow{ font-size:10.5px; text-align:center; color:var(--muted); padding-bottom:4px; }
+  .cal-cell{ aspect-ratio:1; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11.5px; border:1px solid var(--line); background:#fff; }
+  .cal-cell .cd{ font-weight:600; }
+  .cal-dot{ width:7px; height:7px; border-radius:50%; margin-top:2px; }
+  .cal-cell.empty-cell{ border:none; background:none; }
+
+  .barwrap{ display:flex; align-items:flex-end; gap:10px; height:130px; padding-top:10px; }
+  .bar{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; }
+  .bar-fill{ width:60%; border-radius:4px 4px 0 0; min-height:2px; }
+  .bar-label{ font-size:10.5px; color:var(--muted); }
+
+  .locked-banner{ background:#3A3F3A; color:#fff; padding:8px 14px; border-radius:6px; font-size:12.5px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+</style>
+
+<div id="ams-root" class="ams"></div>
+
+<script>
+(function(){
+
+const STATUSES = ["PRESENT","ABSENT","LATE","HALF_DAY","ON_LEAVE","WFH","HOLIDAY","WEEK_OFF"];
+const STATUS_LABEL = {PRESENT:"Present",ABSENT:"Absent",LATE:"Late",HALF_DAY:"Half Day",ON_LEAVE:"On Leave",WFH:"WFH",HOLIDAY:"Holiday",WEEK_OFF:"Week Off"};
+
+function pad(n){ return n<10?"0"+n:""+n; }
+function fmtDate(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function todayStr(){ return fmtDate(new Date()); }
+function nowTimeStr(){ const d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds()); }
+function niceTime(t){ if(!t) return "—"; const [h,m]=t.split(":"); const hh=parseInt(h,10); const ap=hh>=12?"PM":"AM"; const h12=((hh%12)||12); return h12+":"+m+" "+ap; }
+function uid(prefix){ return prefix+"_"+Math.random().toString(36).slice(2,9); }
+function minutesBetween(t1,t2){
+  const [h1,m1]=t1.split(":").map(Number), [h2,m2]=t2.split(":").map(Number);
+  return (h2*60+m2)-(h1*60+m1);
+}
+function fmtHM(mins){ if(mins<0) mins=0; const h=Math.floor(mins/60), m=mins%60; return h+"h "+m+"m"; }
+
+// ---------------- Seed data ----------------
+const DEPARTMENTS = [
+  {id:"D1", name:"Warehouse", managerId:"E2", password:"Warehouse@123"},
+  {id:"D2", name:"Operations", managerId:"E3", password:"Operations@123"},
+  {id:"D3", name:"HR", managerId:"E4", password:"HR@123"},
+];
+const SHIFTS = [
+  {id:"S1", name:"General Shift", start:"09:00", end:"18:00", grace:15},
+  {id:"S2", name:"Night Shift", start:"21:00", end:"06:00", grace:10},
+];
+const EMPLOYEES = [
+  {id:"E1", name:"Admin User", email:"admin@company.com", mobile:"9000000001", deptId:"D3", designation:"System Admin", role:"ADMIN", managerId:null, shiftId:"S1", joined:"2021-01-04", status:"Active"},
+  {id:"E2", name:"Priya Nair", email:"priya.nair@company.com", mobile:"9000000002", deptId:"D1", designation:"Warehouse Manager", role:"MANAGER", managerId:"E1", shiftId:"S1", joined:"2021-03-11", status:"Active"},
+  {id:"E3", name:"Arjun Rao", email:"arjun.rao@company.com", mobile:"9000000003", deptId:"D2", designation:"Ops Manager", role:"MANAGER", managerId:"E1", shiftId:"S1", joined:"2020-07-22", status:"Active"},
+  {id:"E4", name:"Sunita Iyer", email:"sunita.iyer@company.com", mobile:"9000000004", deptId:"D3", designation:"HR Manager", role:"MANAGER", managerId:"E1", shiftId:"S1", joined:"2019-11-02", status:"Active"},
+  {id:"E5", name:"Rahul Verma", email:"rahul.verma@company.com", mobile:"9000000005", deptId:"D1", designation:"Warehouse Associate", role:"EMPLOYEE", managerId:"E2", shiftId:"S1", joined:"2022-02-14", status:"Active"},
+  {id:"E6", name:"Meena Pillai", email:"meena.pillai@company.com", mobile:"9000000006", deptId:"D1", designation:"Warehouse Associate", role:"EMPLOYEE", managerId:"E2", shiftId:"S1", joined:"2022-05-19", status:"Active"},
+  {id:"E7", name:"Karthik S", email:"karthik.s@company.com", mobile:"9000000007", deptId:"D2", designation:"Ops Executive", role:"EMPLOYEE", managerId:"E3", shiftId:"S1", joined:"2023-01-09", status:"Active"},
+  {id:"E8", name:"Divya Menon", email:"divya.menon@company.com", mobile:"9000000008", deptId:"D2", designation:"Ops Executive", role:"EMPLOYEE", managerId:"E3", shiftId:"S1", joined:"2023-04-03", status:"Active"},
+];
+const LEAVE_TYPES = ["Casual Leave","Sick Leave","Earned Leave","Emergency Leave"];
+
+function seedAttendance(){
+  const recs = [];
+  const emp = EMPLOYEES.filter(e=>true);
+  const today = new Date();
+  for(let back=6; back>=1; back--){
+    const d = new Date(today); d.setDate(d.getDate()-back);
+    const ds = fmtDate(d);
+    const dow = d.getDay();
+    emp.forEach(e=>{
+      if(dow===0){ recs.push({id:uid("A"), empId:e.id, date:ds, status:"WEEK_OFF", checkIn:null, checkOut:null, remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); return; }
+      const roll = Math.random();
+      if(roll<0.06){ recs.push({id:uid("A"), empId:e.id, date:ds, status:"ABSENT", checkIn:null, checkOut:null, remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); }
+      else if(roll<0.14){ recs.push({id:uid("A"), empId:e.id, date:ds, status:"LATE", checkIn:"09:"+pad(20+Math.floor(Math.random()*30)), checkOut:"18:"+pad(Math.floor(Math.random()*40)), remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); }
+      else if(roll<0.18){ recs.push({id:uid("A"), empId:e.id, date:ds, status:"WFH", checkIn:"09:0"+Math.floor(Math.random()*5), checkOut:"18:0"+Math.floor(Math.random()*5), remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); }
+      else if(roll<0.22){ recs.push({id:uid("A"), empId:e.id, date:ds, status:"ON_LEAVE", checkIn:null, checkOut:null, remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); }
+      else { recs.push({id:uid("A"), empId:e.id, date:ds, status:"PRESENT", checkIn:"08:5"+Math.floor(Math.random()*9), checkOut:"18:0"+Math.floor(Math.random()*9), remarks:"", createdBy:"SYSTEM", updatedBy:"SYSTEM", updatedAt:ds}); }
+    });
+  }
+  return recs;
+}
+
+const DEFAULT_STATE = {
+  version:1,
+  employees:EMPLOYEES,
+  departments:DEPARTMENTS,
+  shifts:SHIFTS,
+  attendance: seedAttendance(),
+  leaves: [
+    {id:uid("L"), empId:"E5", type:"Casual Leave", from:fmtDate(new Date(Date.now()+3*864e5)), to:fmtDate(new Date(Date.now()+4*864e5)), days:2, reason:"Family function", status:"PENDING", approvedBy:null, approvedAt:null},
+  ],
+  corrections: [
+    {id:uid("C"), empId:"E7", date:fmtDate(new Date(Date.now()-2*864e5)), currentCheckIn:"10:15", requestedCheckIn:"09:30", reason:"Forgot to punch attendance", status:"PENDING", approvedBy:null, approvedAt:null},
+  ],
+  auditLogs: [],
+  locks: {}, // date -> true
+  notifications: [],
+};
+
+let state = null;
+let storageAvailable = true;
+
+async function loadState(){
+  try{
+    const res = await window.storage.get("ams-state", true);
+    if(res && res.value){ state = JSON.parse(res.value); return; }
+  }catch(e){ /* not found or error */ }
+  state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  await saveState();
+}
+async function saveState(){
+  try{
+    await window.storage.set("ams-state", JSON.stringify(state), true);
+  }catch(e){ storageAvailable = false; }
+}
+function log(user, action, empId, oldV, newV, reason){
+  state.auditLogs.unshift({id:uid("AU"), user:user.name, role:user.role, action, empId, date:new Date().toISOString(), oldValue:oldV||"", newValue:newV||"", reason:reason||""});
+  if(state.auditLogs.length>300) state.auditLogs.length=300;
+}
+function notify(text){
+  state.notifications.unshift({id:uid("N"), text, at:new Date().toISOString(), read:false});
+  if(state.notifications.length>50) state.notifications.length=50;
+}
+
+// ---------------- App state (client) ----------------
+let currentUser = null; // employee object with .role
+let currentView = "dashboard";
+let toastMsg = null;
+let toastTimer = null;
+let modal = null; // {type,...}
+let filters = { dept:"", status:"", from:"", to:"", empId:"" };
+let calMonth = new Date();
+let bulkSelection = new Set();
+
+const root = document.getElementById("ams-root");
+
+function showToast(msg){
+  toastMsg = msg;
+  render();
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ toastMsg=null; render(); }, 2400);
+}
+
+function empById(id){ return state.employees.find(e=>e.id===id); }
+function deptById(id){ return state.departments.find(d=>d.id===id); }
+function shiftById(id){ return state.shifts.find(s=>s.id===id); }
+function visibleEmployees(){
+  if(currentUser.role==="ADMIN") return state.employees;
+  if(currentUser.role==="MANAGER") return state.employees.filter(e=>e.managerId===currentUser.id || e.id===currentUser.id);
+  return state.employees.filter(e=>e.id===currentUser.id);
+}
+function attendanceFor(empId,date){ return state.attendance.find(a=>a.empId===empId && a.date===date); }
+function isLocked(date){ return !!state.locks[date]; }
+
+// ---------------- Actions ----------------
+async function doCheckIn(){
+  const date = todayStr();
+  let rec = attendanceFor(currentUser.id, date);
+  if(rec && rec.checkIn){ showToast("Attendance already marked for this employee."); return; }
+  const shift = shiftById(currentUser.shiftId);
+  const time = nowTimeStr().slice(0,5);
+  let status = "PRESENT";
+  if(shift){
+    const graceEnd = addMinutesToTime(shift.start, shift.grace);
+    if(time > graceEnd) status = "LATE";
+  }
+  if(rec){
+    rec.checkIn = time; rec.status = status; rec.updatedBy=currentUser.name; rec.updatedAt=new Date().toISOString();
+  } else {
+    rec = {id:uid("A"), empId:currentUser.id, date, status, checkIn:time, checkOut:null, remarks:"", createdBy:currentUser.name, updatedBy:currentUser.name, updatedAt:new Date().toISOString()};
+    state.attendance.push(rec);
+  }
+  log(currentUser,"CHECK_IN",currentUser.id,"",time,"");
+  await saveState();
+  showToast("Checked in at "+niceTime(time)+(status==="LATE"?" — marked Late":""));
+  render();
+}
+function addMinutesToTime(t,mins){
+  const [h,m]=t.split(":").map(Number);
+  const total=h*60+m+mins;
+  return pad(Math.floor(total/60)%24)+":"+pad(total%60);
+}
+async function doCheckOut(){
+  const date = todayStr();
+  let rec = attendanceFor(currentUser.id, date);
+  if(!rec || !rec.checkIn){ showToast("Please check in first."); return; }
+  if(rec.checkOut){ showToast("Already checked out today."); return; }
+  const time = nowTimeStr().slice(0,5);
+  if(time < rec.checkIn){ showToast("Check-out time cannot be earlier than check-in time."); return; }
+  rec.checkOut = time; rec.updatedBy=currentUser.name; rec.updatedAt=new Date().toISOString();
+  log(currentUser,"CHECK_OUT",currentUser.id,"",time,"");
+  await saveState();
+  showToast("Checked out at "+niceTime(time));
+  render();
+}
+
+async function saveAttendanceEdit(empId,date,newStatus,newIn,newOut,reason){
+  if(isLocked(date)){ showToast("Attendance is locked."); return false; }
+  if(!reason || !reason.trim()){ showToast("Please provide an edit reason."); return false; }
+  if(newIn && newOut && newOut < newIn){ showToast("Check-out time cannot be earlier than check-in time."); return false; }
+  let rec = attendanceFor(empId,date);
+  const oldV = rec ? `${rec.status}/${rec.checkIn||"-"}/${rec.checkOut||"-"}` : "none";
+  const newV = `${newStatus}/${newIn||"-"}/${newOut||"-"}`;
+  if(rec){
+    rec.status=newStatus; rec.checkIn=newIn||null; rec.checkOut=newOut||null;
+    rec.updatedBy=currentUser.name; rec.updatedAt=new Date().toISOString(); rec.remarks=reason;
+  } else {
+    rec = {id:uid("A"), empId, date, status:newStatus, checkIn:newIn||null, checkOut:newOut||null, remarks:reason, createdBy:currentUser.name, updatedBy:currentUser.name, updatedAt:new Date().toISOString()};
+    state.attendance.push(rec);
+  }
+  log(currentUser,"UPDATE",empId,oldV,newV,reason);
+  await saveState();
+  showToast("Attendance saved successfully.");
+  return true;
+}
+
+async function applyBulk(status){
+  if(bulkSelection.size===0){ showToast("Select at least one employee."); return; }
+  const date = filters.bulkDate || todayStr();
+  if(isLocked(date)){ showToast("Attendance is locked."); return; }
+  bulkSelection.forEach(empId=>{
+    let rec = attendanceFor(empId,date);
+    const oldV = rec ? rec.status : "none";
+    if(rec){ rec.status=status; rec.updatedBy=currentUser.name; rec.updatedAt=new Date().toISOString(); }
+    else { state.attendance.push({id:uid("A"), empId, date, status, checkIn:null, checkOut:null, remarks:"Bulk update", createdBy:currentUser.name, updatedBy:currentUser.name, updatedAt:new Date().toISOString()}); }
+    log(currentUser,"BULK_UPDATE",empId,oldV,status,"Bulk update");
+  });
+  await saveState();
+  showToast("Updated attendance for "+bulkSelection.size+" employee(s).");
+  bulkSelection = new Set();
+  render();
+}
+
+async function toggleLock(date){
+  state.locks[date] = !state.locks[date];
+  log(currentUser, state.locks[date]?"LOCK":"UNLOCK","",date,"","");
+  notify((state.locks[date]?"Locked":"Unlocked")+" attendance for "+date);
+  await saveState();
+  render();
+}
+
+async function applyLeave(empId,type,from,to,reason){
+  if(!from||!to||from>to){ showToast("Please provide valid leave dates."); return; }
+  const days = Math.round((new Date(to)-new Date(from))/864e5)+1;
+  state.leaves.unshift({id:uid("L"), empId, type, from, to, days, reason, status:"PENDING", approvedBy:null, approvedAt:null});
+  notify(empById(empId).name+" applied for "+type);
+  await saveState();
+  showToast("Leave request submitted.");
+  render();
+}
+async function decideLeave(id,decision){
+  const lv = state.leaves.find(l=>l.id===id);
+  if(!lv) return;
+  lv.status = decision; lv.approvedBy=currentUser.name; lv.approvedAt=new Date().toISOString();
+  log(currentUser,"LEAVE_"+decision,lv.empId,"PENDING",decision,"");
+  if(decision==="APPROVED"){
+    let d = new Date(lv.from);
+    const end = new Date(lv.to);
+    while(d<=end){
+      const ds = fmtDate(d);
+      let rec = attendanceFor(lv.empId,ds);
+      if(rec) rec.status="ON_LEAVE"; else state.attendance.push({id:uid("A"),empId:lv.empId,date:ds,status:"ON_LEAVE",checkIn:null,checkOut:null,remarks:lv.type,createdBy:currentUser.name,updatedBy:currentUser.name,updatedAt:new Date().toISOString()});
+      d.setDate(d.getDate()+1);
+    }
+  }
+  notify("Leave "+decision.toLowerCase()+" for "+empById(lv.empId).name);
+  await saveState();
+  showToast("Leave "+decision.toLowerCase()+".");
+  render();
+}
+async function requestCorrection(empId,date,currentIn,requestedIn,reason){
+  if(!reason||!reason.trim()){ showToast("Please provide a reason."); return; }
+  state.corrections.unshift({id:uid("C"), empId, date, currentCheckIn:currentIn, requestedCheckIn:requestedIn, reason, status:"PENDING", approvedBy:null, approvedAt:null});
+  notify(empById(empId).name+" requested an attendance correction");
+  await saveState();
+  showToast("Correction request submitted.");
+  render();
+}
+async function decideCorrection(id,decision){
+  const c = state.corrections.find(x=>x.id===id);
+  if(!c) return;
+  c.status=decision; c.approvedBy=currentUser.name; c.approvedAt=new Date().toISOString();
+  if(decision==="APPROVED"){
+    let rec = attendanceFor(c.empId,c.date);
+    const oldV = rec?rec.checkIn:"-";
+    if(rec) rec.checkIn=c.requestedCheckIn;
+    else state.attendance.push({id:uid("A"),empId:c.empId,date:c.date,status:"PRESENT",checkIn:c.requestedCheckIn,checkOut:null,remarks:"Correction approved",createdBy:currentUser.name,updatedBy:currentUser.name,updatedAt:new Date().toISOString()});
+    log(currentUser,"CORRECTION_APPROVED",c.empId,oldV,c.requestedCheckIn,c.reason);
+  } else {
+    log(currentUser,"CORRECTION_REJECTED",c.empId,"","",c.reason);
+  }
+  notify("Correction "+decision.toLowerCase()+" for "+empById(c.empId).name);
+  await saveState();
+  showToast("Correction "+decision.toLowerCase()+".");
+  render();
+}
+
+async function addEmployee(data,customId){
+  const id = customId || uid("E");
+  state.employees.push({id, ...data, status:"Active"});
+  log(currentUser,"CREATE_EMPLOYEE",id,"",data.name,"");
+  await saveState();
+  showToast("Employee added — Login ID: "+id+".");
+  render();
+}
+async function updateEmployee(id,data){
+  const e = empById(id);
+  Object.assign(e,data);
+  log(currentUser,"UPDATE_EMPLOYEE",id,"",JSON.stringify(data),"");
+  await saveState();
+  showToast("Employee updated.");
+  render();
+}
+async function toggleEmployeeStatus(id){
+  const e = empById(id);
+  e.status = e.status==="Active"?"Inactive":"Active";
+  log(currentUser,"TOGGLE_STATUS",id,"",e.status,"");
+  await saveState();
+  showToast(e.name+" is now "+e.status+".");
+  render();
+}
+async function addDepartment(name,managerId,password){
+  state.departments.push({id:uid("D"),name,managerId,password:password||"Welcome@123"});
+  await saveState(); showToast("Department added."); render();
+}
+async function addShift(name,start,end,grace){
+  state.shifts.push({id:uid("S"),name,start,end,grace:Number(grace)});
+  await saveState(); showToast("Shift added."); render();
+}
+
+function exportCSV(rows, headers, filename){
+  const lines = [headers.join(",")];
+  rows.forEach(r=>{ lines.push(r.map(v=>`"${(v===null||v===undefined?"":v).toString().replace(/"/g,'""')}"`).join(",")); });
+  const blob = new Blob([lines.join("\n")], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---------------- Rendering helpers ----------------
+function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstChild; }
+
+function statCounts(date){
+  const emps = visibleEmployees();
+  const counts = {PRESENT:0,ABSENT:0,LATE:0,ON_LEAVE:0,WFH:0,HALF_DAY:0,HOLIDAY:0,WEEK_OFF:0};
+  let marked=0;
+  emps.forEach(e=>{
+    const rec = attendanceFor(e.id,date);
+    if(rec){ counts[rec.status]=(counts[rec.status]||0)+1; marked++; }
+  });
+  const pct = emps.length? Math.round(((counts.PRESENT+counts.LATE+counts.WFH+counts.HALF_DAY*0.5) / emps.length)*100):0;
+  return {counts, total:emps.length, pct};
+}
+
+function renderLogin(){
+  root.innerHTML = "";
+  const wrap = el(`<div class="login-wrap">
+    <div class="login-card">
+      <h1>Smart Attendance</h1>
+      <div class="login-sub">Sign in with your Employee ID and department password.</div>
+      <div class="field">
+        <label>Employee ID</label>
+        <input type="text" id="login-empid" placeholder="e.g. E5">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Your department's password">
+      </div>
+      <div id="login-error" class="login-error" style="display:none;"></div>
+      <button class="login-go" id="login-go">Sign in</button>
+    </div>
+  </div>`);
+
+  const idInput = wrap.querySelector("#login-empid");
+  const pwInput = wrap.querySelector("#login-password");
+  const errorBox = wrap.querySelector("#login-error");
+
+  function attemptLogin(){
+    const id = idInput.value.trim().toLowerCase();
+    const pw = pwInput.value;
+    if(!id){ errorBox.textContent="Please enter your Employee ID."; errorBox.style.display="block"; return; }
+    if(!pw){ errorBox.textContent="Please enter your password."; errorBox.style.display="block"; return; }
+    const match = state.employees.find(e=> e.id.toLowerCase()===id);
+    if(!match){ errorBox.textContent="No account found for that Employee ID."; errorBox.style.display="block"; return; }
+    if(match.status!=="Active"){ errorBox.textContent="This account has been disabled."; errorBox.style.display="block"; return; }
+    const dept = deptById(match.deptId);
+    const expected = match.password || (dept && dept.password);
+    if(!expected || pw !== expected){ errorBox.textContent="Incorrect password."; errorBox.style.display="block"; return; }
+    currentUser = match;
+    currentView = "dashboard";
+    render();
+  }
+  wrap.querySelector("#login-go").addEventListener("click",attemptLogin);
+  pwInput.addEventListener("keydown",e=>{ if(e.key==="Enter") attemptLogin(); });
+  idInput.addEventListener("keydown",e=>{ if(e.key==="Enter") pwInput.focus(); });
+  root.appendChild(wrap);
+}
+
+function navItemsFor(role){
+  const base = [{k:"dashboard",l:"Dashboard"},{k:"attendance",l:"Attendance"},{k:"calendar",l:"Calendar"},{k:"leaves",l:"Leave"},{k:"corrections",l:"Corrections"}];
+  if(role==="MANAGER"||role==="ADMIN"){ base.push({k:"reports",l:"Reports"}); }
+  if(role==="ADMIN"){
+    base.push({k:"employees",l:"Employees"});
+    base.push({k:"departments",l:"Departments"});
+    base.push({k:"shifts",l:"Shifts"});
+    base.push({k:"audit",l:"Audit Logs"});
+  }
+  base.push({k:"notifications",l:"Notifications"});
+  return base;
+}
+
+function renderShell(contentFn){
+  root.innerHTML = "";
+  const shell = el(`<div class="app-shell">
+    <div class="sidebar">
+      <div class="brand"><div class="brand-name">Smart Attendance</div><div class="brand-tag">TIME &amp; WORKFORCE</div></div>
+      <div id="nav"></div>
+      <div class="nav-spacer"></div>
+      <div class="nav-user">
+        <div class="u-name">${currentUser.name}</div>
+        <div class="u-role">${currentUser.role}</div>
+        <button class="logout-btn" id="logout">Sign out</button>
+      </div>
+    </div>
+    <div class="main" id="main"></div>
+  </div>`);
+  const nav = shell.querySelector("#nav");
+  navItemsFor(currentUser.role).forEach(item=>{
+    const b = el(`<button class="nav-item ${currentView===item.k?'active':''}">${item.l}</button>`);
+    b.addEventListener("click",()=>{ currentView=item.k; bulkSelection=new Set(); render(); });
+    nav.appendChild(b);
+  });
+  shell.querySelector("#logout").addEventListener("click",()=>{ currentUser=null; render(); });
+  root.appendChild(shell);
+  const main = shell.querySelector("#main");
+  contentFn(main);
+  if(toastMsg){
+    root.appendChild(el(`<div class="toast">${toastMsg}</div>`));
+  }
+  if(modal){ renderModal(); }
+}
+
+function pageHeader(main,title,sub,actionsHtml){
+  const bar = el(`<div class="topbar">
+    <div><h1>${title}</h1><div class="topbar-sub">${sub||""}</div></div>
+    <div style="display:flex;gap:8px;">${actionsHtml||""}</div>
+  </div>`);
+  main.appendChild(bar);
+  return bar;
+}
+
+// ---------------- Dashboard ----------------
+function renderDashboard(main){
+  pageHeader(main, "Dashboard", "Overview for "+niceDate(todayStr()));
+  const {counts,total,pct} = statCounts(todayStr());
+
+  {
+    const rec = attendanceFor(currentUser.id, todayStr());
+    const hero = el(`<div class="punch-hero">
+      <div>
+        <div class="punch-time" id="clock">--:--:--</div>
+        <div class="punch-date">${niceDate(todayStr())}</div>
+        <div class="punch-status">${rec && rec.checkIn ? `Checked in <b>${niceTime(rec.checkIn)}</b>` + (rec.checkOut? ` · Checked out <b>${niceTime(rec.checkOut)}</b>` : "") : "Not checked in yet"}</div>
+      </div>
+      <div>
+        ${!rec || !rec.checkIn ? `<button class="punch-btn punch-in" id="punchbtn">Check In</button>`
+          : !rec.checkOut ? `<button class="punch-btn punch-out" id="punchbtn">Check Out</button>`
+          : `<button class="punch-btn punch-done" disabled>Day Complete</button>`}
+      </div>
+    </div>`);
+    main.appendChild(hero);
+    const ck = hero.querySelector("#clock");
+    const tick=()=>{ ck.textContent = new Date().toLocaleTimeString(); };
+    tick(); setInterval(tick,1000);
+    const btn = hero.querySelector("#punchbtn");
+    if(btn) btn.addEventListener("click", async ()=>{
+      if(btn.textContent==="Check In") await doCheckIn(); else await doCheckOut();
+    });
+  }
+
+  const grid = el(`<div class="grid grid-6" style="margin-bottom:18px;"></div>`);
+  const cards = [
+    ["Team Size",total,"stat-total"],
+    ["Present",counts.PRESENT,"stat-present"],
+    ["Absent",counts.ABSENT,"stat-absent"],
+    ["Late",counts.LATE,"stat-late"],
+    ["On Leave",counts.ON_LEAVE,"stat-leave"],
+    ["Attendance %",pct+"%","stat-pct"],
+  ];
+  cards.forEach(([label,num,cls])=>{
+    grid.appendChild(el(`<div class="card stat-card ${cls}"><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`));
+  });
+  main.appendChild(grid);
+
+  const g2 = el(`<div class="grid grid-2"></div>`);
+  const chartCard = el(`<div class="card"><div class="section-title">Status breakdown — today</div><div class="barwrap" id="bars"></div></div>`);
+  const bars = chartCard.querySelector("#bars");
+  const colorMap = {PRESENT:"var(--present)",ABSENT:"var(--absent)",LATE:"var(--late)",ON_LEAVE:"var(--leave)",WFH:"var(--wfh)",HALF_DAY:"var(--halfday)"};
+  const maxV = Math.max(1,...Object.values(counts));
+  Object.keys(colorMap).forEach(k=>{
+    const h = Math.round((counts[k]/maxV)*100);
+    bars.appendChild(el(`<div class="bar"><div class="bar-fill" style="height:${Math.max(h,3)}%;background:${colorMap[k]};"></div><div class="bar-label">${STATUS_LABEL[k]}</div><div style="font-size:11px;font-weight:600;">${counts[k]}</div></div>`));
+  });
+  g2.appendChild(chartCard);
+
+  const deptCard = el(`<div class="card"><div class="section-title">Department attendance</div><table><thead><tr><th>Department</th><th>Employees</th><th>Present today</th></tr></thead><tbody></tbody></table></div>`);
+  const tbody = deptCard.querySelector("tbody");
+  const deptsShown = currentUser.role==="ADMIN" ? state.departments : state.departments.filter(d=>d.id===currentUser.deptId);
+  deptsShown.forEach(d=>{
+    const emps = state.employees.filter(e=>e.deptId===d.id);
+    const present = emps.filter(e=>{ const r=attendanceFor(e.id,todayStr()); return r && (r.status==="PRESENT"||r.status==="LATE"||r.status==="WFH"); }).length;
+    tbody.appendChild(el(`<tr><td>${d.name}</td><td>${emps.length}</td><td>${present}</td></tr>`));
+  });
+  g2.appendChild(deptCard);
+  main.appendChild(g2);
+}
+
+function niceDate(ds){
+  const d = new Date(ds+"T00:00:00");
+  return d.toLocaleDateString(undefined,{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+}
+
+// ---------------- Attendance ----------------
+function renderAttendance(main){
+  const isSelf = currentUser.role==="EMPLOYEE";
+  pageHeader(main, "Attendance", isSelf? "Your attendance records" : "Team attendance records",
+    currentUser.role!=="EMPLOYEE" ? `<button class="btn btn-brass" id="bulk-toggle">Bulk Update</button>` : "");
+
+  const emps = visibleEmployees();
+  const f = el(`<div class="filters">
+    ${currentUser.role!=="EMPLOYEE" ? `<select id="f-emp"><option value="">All employees</option>${emps.map(e=>`<option value="${e.id}" ${filters.empId===e.id?'selected':''}>${e.name}</option>`).join("")}</select>` : ""}
+    ${currentUser.role==="ADMIN" ? `<select id="f-dept"><option value="">All departments</option>${state.departments.map(d=>`<option value="${d.id}" ${filters.dept===d.id?'selected':''}>${d.name}</option>`).join("")}</select>` : ""}
+    <select id="f-status"><option value="">All statuses</option>${STATUSES.map(s=>`<option value="${s}" ${filters.status===s?'selected':''}>${STATUS_LABEL[s]}</option>`).join("")}</select>
+    <input type="date" id="f-from" value="${filters.from||""}">
+    <input type="date" id="f-to" value="${filters.to||""}">
+    <button class="btn btn-sm" id="f-reset">Reset Filters</button>
+    <button class="btn btn-sm" id="f-export">Export Excel</button>
+  </div>`);
+  main.appendChild(f);
+  f.querySelector("#f-status").addEventListener("change",e=>{ filters.status=e.target.value; render(); });
+  f.querySelector("#f-from").addEventListener("change",e=>{ filters.from=e.target.value; render(); });
+  f.querySelector("#f-to").addEventListener("change",e=>{ filters.to=e.target.value; render(); });
+  f.querySelector("#f-reset").addEventListener("click",()=>{ filters={dept:"",status:"",from:"",to:"",empId:""}; render(); });
+  const fe = f.querySelector("#f-emp"); if(fe) fe.addEventListener("change",e=>{ filters.empId=e.target.value; render(); });
+  const fd = f.querySelector("#f-dept"); if(fd) fd.addEventListener("change",e=>{ filters.dept=e.target.value; render(); });
+
+  let records = state.attendance.filter(a=>{
+    const e = empById(a.empId); if(!e) return false;
+    if(isSelf && a.empId!==currentUser.id) return false;
+    if(!isSelf && currentUser.role==="MANAGER" && !(e.managerId===currentUser.id||e.id===currentUser.id)) return false;
+    if(filters.empId && a.empId!==filters.empId) return false;
+    if(filters.dept && e.deptId!==filters.dept) return false;
+    if(filters.status && a.status!==filters.status) return false;
+    if(filters.from && a.date<filters.from) return false;
+    if(filters.to && a.date>filters.to) return false;
+    return true;
+  }).sort((a,b)=> b.date.localeCompare(a.date));
+
+  f.querySelector("#f-export").addEventListener("click",()=>{
+    exportCSV(records.map(r=>{
+      const e=empById(r.empId);
+      const wh = (r.checkIn&&r.checkOut)? fmtHM(minutesBetween(r.checkIn,r.checkOut)) : "-";
+      return [e.id,e.name,deptById(e.deptId).name,r.date,r.checkIn||"-",r.checkOut||"-",wh,r.status,r.remarks||"",r.updatedBy,r.updatedAt];
+    }), ["Employee ID","Employee Name","Department","Date","Check In","Check Out","Working Hours","Status","Remarks","Updated By","Updated Time"], "attendance_export.csv");
+  });
+
+  const bulkBtn = main.querySelector("#bulk-toggle");
+  let bulkMode = false;
+  if(bulkBtn) bulkBtn.addEventListener("click",()=>{ bulkMode=!bulkMode; renderBulkPanel(); });
+
+  const bulkPanelHolder = el(`<div id="bulk-panel"></div>`);
+  main.appendChild(bulkPanelHolder);
+  function renderBulkPanel(){
+    bulkPanelHolder.innerHTML="";
+    if(!bulkMode) return;
+    const panel = el(`<div class="card" style="margin-bottom:14px;">
+      <div class="section-title">Bulk attendance update</div>
+      <div class="filters">
+        <input type="date" id="bulk-date" value="${todayStr()}">
+        ${STATUSES.map(s=>`<button class="btn btn-sm" data-s="${s}">${STATUS_LABEL[s]}</button>`).join("")}
+        <span style="color:var(--muted);font-size:12px;align-self:center;">${bulkSelection.size} selected</span>
+      </div>
+      <div style="max-height:180px;overflow:auto;">
+        ${emps.map(e=>`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;"><input type="checkbox" data-emp="${e.id}" ${bulkSelection.has(e.id)?'checked':''}> ${e.name}</label>`).join("")}
+      </div>
+    </div>`);
+    panel.querySelector("#bulk-date").addEventListener("change",e=>{ filters.bulkDate=e.target.value; });
+    panel.querySelectorAll("input[data-emp]").forEach(cb=>{
+      cb.addEventListener("change",e=>{ const id=e.target.dataset.emp; if(e.target.checked) bulkSelection.add(id); else bulkSelection.delete(id); renderBulkPanel(); });
+    });
+    panel.querySelectorAll("button[data-s]").forEach(b=>{
+      b.addEventListener("click", async ()=>{
+        if(!confirm(`Are you sure you want to update attendance for ${bulkSelection.size} employee(s) to ${STATUS_LABEL[b.dataset.s]}?`)) return;
+        await applyBulk(b.dataset.s);
+      });
+    });
+    bulkPanelHolder.appendChild(panel);
+  }
+
+  const tableCard = el(`<div class="card"></div>`);
+  if(records.length===0){
+    tableCard.appendChild(el(`<div class="empty">No attendance records match your filters.</div>`));
+  } else {
+    const t = el(`<table><thead><tr>
+      <th>Employee</th><th>Department</th><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th>${currentUser.role!=="EMPLOYEE"?"<th></th>":""}
+    </tr></thead><tbody></tbody></table>`);
+    const tbody = t.querySelector("tbody");
+    records.slice(0,150).forEach(r=>{
+      const e = empById(r.empId);
+      const wh = (r.checkIn && r.checkOut) ? fmtHM(minutesBetween(r.checkIn,r.checkOut)) : "—";
+      const row = el(`<tr>
+        <td>${e.name}</td><td>${deptById(e.deptId).name}</td><td>${r.date}${isLocked(r.date)?' 🔒':''}</td>
+        <td>${niceTime(r.checkIn)}</td><td>${niceTime(r.checkOut)}</td><td>${wh}</td>
+        <td><span class="pill pill-${r.status}">${STATUS_LABEL[r.status]}</span></td>
+        ${currentUser.role!=="EMPLOYEE" ? `<td><button class="btn btn-sm edit-btn">Edit</button></td>` : ""}
+      </tr>`);
+      const editBtn = row.querySelector(".edit-btn");
+      if(editBtn) editBtn.addEventListener("click",()=>{ modal={type:"edit-attendance", rec:r}; render(); });
+      tbody.appendChild(row);
+    });
+    tableCard.appendChild(t);
+  }
+  main.appendChild(tableCard);
+}
+
+// ---------------- Calendar ----------------
+function renderCalendar(main){
+  const emps = visibleEmployees();
+  pageHeader(main,"Calendar","Monthly attendance view");
+  const sel = el(`<div class="filters">
+    ${currentUser.role!=="EMPLOYEE" ? `<select id="cal-emp">${emps.map(e=>`<option value="${e.id}">${e.name}</option>`).join("")}</select>` : ""}
+    <button class="btn btn-sm" id="cal-prev">‹ Prev</button>
+    <span style="align-self:center;font-weight:600;">${calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</span>
+    <button class="btn btn-sm" id="cal-next">Next ›</button>
+  </div>`);
+  main.appendChild(sel);
+  let empId = currentUser.role==="EMPLOYEE" ? currentUser.id : (sel.querySelector("#cal-emp")?.value || emps[0]?.id);
+  const ce = sel.querySelector("#cal-emp");
+  if(ce) ce.addEventListener("change",e=>{ empId=e.target.value; renderCal(); });
+  sel.querySelector("#cal-prev").addEventListener("click",()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); render(); });
+  sel.querySelector("#cal-next").addEventListener("click",()=>{ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); render(); });
+
+  const card = el(`<div class="card"></div>`);
+  main.appendChild(card);
+  const legend = el(`<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:11.5px;color:var(--muted);">
+    ${STATUSES.map(s=>`<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--${s.toLowerCase().replace('_','')==='halfday'?'halfday':s.toLowerCase().replace('_','')});display:inline-block;"></span>${STATUS_LABEL[s]}</span>`).join("")}
+  </div>`);
+  card.appendChild(legend);
+  const grid = el(`<div class="cal-grid"></div>`);
+  card.appendChild(grid);
+  function renderCal(){
+    grid.innerHTML="";
+    ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>grid.appendChild(el(`<div class="cal-dow">${d}</div>`)));
+    const first = new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
+    const startDow = first.getDay();
+    const daysInMonth = new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0).getDate();
+    for(let i=0;i<startDow;i++) grid.appendChild(el(`<div class="cal-cell empty-cell"></div>`));
+    for(let d=1; d<=daysInMonth; d++){
+      const ds = fmtDate(new Date(calMonth.getFullYear(),calMonth.getMonth(),d));
+      const rec = empId ? attendanceFor(empId,ds) : null;
+      const colorVar = rec ? `var(--${rec.status.toLowerCase().replace(/_/g,'')})` : "transparent";
+      const cell = el(`<div class="cal-cell" title="${rec?STATUS_LABEL[rec.status]:''}"><div class="cd">${d}</div>${rec?`<div class="cal-dot" style="background:${colorVar}"></div>`:''}</div>`);
+      grid.appendChild(cell);
+    }
+  }
+  renderCal();
+}
+
+// ---------------- Leaves ----------------
+function renderLeaves(main){
+  pageHeader(main,"Leave Management", currentUser.role==="EMPLOYEE"?"Apply for and track your leave":"Review and approve leave requests",
+    currentUser.role==="EMPLOYEE"?`<button class="btn btn-brass" id="apply-leave">Apply for Leave</button>`:"");
+  const ab = main.querySelector("#apply-leave");
+  if(ab) ab.addEventListener("click",()=>{ modal={type:"apply-leave"}; render(); });
+
+  let rows = state.leaves.filter(l=>{
+    const e = empById(l.empId);
+    if(currentUser.role==="EMPLOYEE") return l.empId===currentUser.id;
+    if(currentUser.role==="MANAGER") return e.managerId===currentUser.id;
+    return true;
+  });
+  const card = el(`<div class="card"></div>`);
+  if(rows.length===0){ card.appendChild(el(`<div class="empty">No leave requests yet.</div>`)); }
+  else {
+    const t = el(`<table><thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th>${currentUser.role!=="EMPLOYEE"?"<th></th>":""}</tr></thead><tbody></tbody></table>`);
+    const tbody = t.querySelector("tbody");
+    rows.forEach(l=>{
+      const e = empById(l.empId);
+      const row = el(`<tr><td>${e.name}</td><td>${l.type}</td><td>${l.from}</td><td>${l.to}</td><td>${l.days}</td><td>${l.reason}</td>
+        <td><span class="pill pill-${l.status}">${l.status}</span></td>
+        ${currentUser.role!=="EMPLOYEE" && l.status==="PENDING" ? `<td><button class="btn btn-sm" data-a="APPROVED">Approve</button> <button class="btn btn-sm btn-danger" data-a="REJECTED">Reject</button></td>` : (currentUser.role!=="EMPLOYEE"?"<td></td>":"")}
+      </tr>`);
+      row.querySelectorAll("button[data-a]").forEach(b=>b.addEventListener("click",()=>decideLeave(l.id,b.dataset.a)));
+      tbody.appendChild(row);
+    });
+    card.appendChild(t);
+  }
+  main.appendChild(card);
+}
+
+// ---------------- Corrections ----------------
+function renderCorrections(main){
+  pageHeader(main,"Correction Requests", currentUser.role==="EMPLOYEE"?"Request a fix to your attendance":"Review employee correction requests",
+    currentUser.role==="EMPLOYEE"?`<button class="btn btn-brass" id="req-corr">New Request</button>`:"");
+  const rb = main.querySelector("#req-corr");
+  if(rb) rb.addEventListener("click",()=>{ modal={type:"request-correction"}; render(); });
+
+  let rows = state.corrections.filter(c=>{
+    const e = empById(c.empId);
+    if(currentUser.role==="EMPLOYEE") return c.empId===currentUser.id;
+    if(currentUser.role==="MANAGER") return e.managerId===currentUser.id;
+    return true;
+  });
+  const card = el(`<div class="card"></div>`);
+  if(rows.length===0){ card.appendChild(el(`<div class="empty">No correction requests.</div>`)); }
+  else {
+    const t = el(`<table><thead><tr><th>Employee</th><th>Date</th><th>Current In</th><th>Requested In</th><th>Reason</th><th>Status</th>${currentUser.role!=="EMPLOYEE"?"<th></th>":""}</tr></thead><tbody></tbody></table>`);
+    const tbody = t.querySelector("tbody");
+    rows.forEach(c=>{
+      const e = empById(c.empId);
+      const row = el(`<tr><td>${e.name}</td><td>${c.date}</td><td>${niceTime(c.currentCheckIn)}</td><td>${niceTime(c.requestedCheckIn)}</td><td>${c.reason}</td>
+        <td><span class="pill pill-${c.status}">${c.status}</span></td>
+        ${currentUser.role!=="EMPLOYEE" && c.status==="PENDING" ? `<td><button class="btn btn-sm" data-a="APPROVED">Approve</button> <button class="btn btn-sm btn-danger" data-a="REJECTED">Reject</button></td>` : (currentUser.role!=="EMPLOYEE"?"<td></td>":"")}
+      </tr>`);
+      row.querySelectorAll("button[data-a]").forEach(b=>b.addEventListener("click",()=>decideCorrection(c.id,b.dataset.a)));
+      tbody.appendChild(row);
+    });
+    card.appendChild(t);
+  }
+  main.appendChild(card);
+}
+
+// ---------------- Reports ----------------
+function renderReports(main){
+  pageHeader(main,"Monthly Report","Attendance % and summary by employee");
+  const monthSel = el(`<div class="filters">
+    <input type="month" id="rep-month" value="${todayStr().slice(0,7)}">
+    <button class="btn btn-sm" id="rep-export">Export Excel</button>
+  </div>`);
+  main.appendChild(monthSel);
+  let month = monthSel.querySelector("#rep-month").value;
+  monthSel.querySelector("#rep-month").addEventListener("change",e=>{ filters.repMonth=e.target.value; render(); });
+  if(filters.repMonth) month = filters.repMonth;
+
+  const emps = visibleEmployees();
+  const rows = emps.map(e=>{
+    const recs = state.attendance.filter(a=>a.empId===e.id && a.date.startsWith(month));
+    const c = {PRESENT:0,ABSENT:0,LATE:0,ON_LEAVE:0,WFH:0,HALF_DAY:0};
+    recs.forEach(r=>{ if(c[r.status]!==undefined) c[r.status]++; });
+    const workingDays = recs.filter(r=>r.status!=="WEEK_OFF"&&r.status!=="HOLIDAY").length || 1;
+    const pct = Math.round(((c.PRESENT+c.LATE+c.WFH+c.HALF_DAY*0.5)/workingDays)*100);
+    return {e,c,pct};
+  });
+  monthSel.querySelector("#rep-export").addEventListener("click",()=>{
+    exportCSV(rows.map(r=>[r.e.id,r.e.name,r.c.PRESENT,r.c.ABSENT,r.c.LATE,r.c.ON_LEAVE,r.c.WFH,r.c.HALF_DAY,r.pct+"%"]),
+      ["Employee ID","Employee","Present","Absent","Late","Leave","WFH","Half Day","Attendance %"], "monthly_report_"+month+".csv");
+  });
+
+  const card = el(`<div class="card"></div>`);
+  const t = el(`<table><thead><tr><th>Employee</th><th>Present</th><th>Absent</th><th>Late</th><th>Leave</th><th>WFH</th><th>Half Day</th><th>Attendance %</th></tr></thead><tbody></tbody></table>`);
+  const tbody = t.querySelector("tbody");
+  rows.forEach(r=>{
+    tbody.appendChild(el(`<tr><td>${r.e.name}</td><td>${r.c.PRESENT}</td><td>${r.c.ABSENT}</td><td>${r.c.LATE}</td><td>${r.c.ON_LEAVE}</td><td>${r.c.WFH}</td><td>${r.c.HALF_DAY}</td><td><b>${r.pct}%</b></td></tr>`));
+  });
+  card.appendChild(t);
+  main.appendChild(card);
+}
+
+// ---------------- Employees (Admin) ----------------
+function renderEmployees(main){
+  pageHeader(main,"Employees","Manage employee records — the Employee ID is each person's login ID", `<button class="btn btn-brass" id="add-emp">Add Employee</button>`);
+  main.querySelector("#add-emp").addEventListener("click",()=>{ modal={type:"employee-form"}; render(); });
+  const f = el(`<div class="filters">
+    <input type="text" id="q" placeholder="Search by name or ID" value="${filters.q||""}">
+    <select id="fd"><option value="">All departments</option>${state.departments.map(d=>`<option value="${d.id}" ${filters.dept===d.id?'selected':''}>${d.name}</option>`).join("")}</select>
+    <button class="btn btn-sm" id="exp">Export</button>
+  </div>`);
+  main.appendChild(f);
+  f.querySelector("#q").addEventListener("input",e=>{ filters.q=e.target.value; render(); });
+  f.querySelector("#fd").addEventListener("change",e=>{ filters.dept=e.target.value; render(); });
+
+  let rows = state.employees.filter(e=>{
+    if(filters.q && !(e.name.toLowerCase().includes(filters.q.toLowerCase())||e.id.toLowerCase().includes(filters.q.toLowerCase()))) return false;
+    if(filters.dept && e.deptId!==filters.dept) return false;
+    return true;
+  });
+  f.querySelector("#exp").addEventListener("click",()=>{
+    exportCSV(rows.map(e=>[e.id,e.name,e.mobile,deptById(e.deptId).name,e.designation,e.role,e.joined,e.status]),
+      ["Employee ID","Name","Mobile","Department","Designation","Role","Joined","Status"],"employees.csv");
+  });
+
+  const card = el(`<div class="card"></div>`);
+  const t = el(`<table><thead><tr><th>Employee ID (Login ID)</th><th>Name</th><th>Department</th><th>Designation</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>`);
+  const tbody = t.querySelector("tbody");
+  rows.forEach(e=>{
+    const row = el(`<tr><td>${e.id}</td><td>${e.name}</td><td>${deptById(e.deptId)?.name||"—"}</td><td>${e.designation}</td><td>${e.role}</td>
+      <td><span class="pill" style="background:${e.status==='Active'?'var(--present)':'var(--muted)'}">${e.status}</span></td>
+      <td><button class="btn btn-sm" data-a="edit">Edit</button> <button class="btn btn-sm" data-a="pw">Change Password</button> <button class="btn btn-sm" data-a="toggle">${e.status==='Active'?'Disable':'Enable'}</button></td>
+    </tr>`);
+    row.querySelector('[data-a="edit"]').addEventListener("click",()=>{ modal={type:"employee-form",emp:e}; render(); });
+    row.querySelector('[data-a="pw"]').addEventListener("click",()=>{ modal={type:"emp-password",emp:e}; render(); });
+    row.querySelector('[data-a="toggle"]').addEventListener("click",()=>toggleEmployeeStatus(e.id));
+    tbody.appendChild(row);
+  });
+  card.appendChild(t);
+  main.appendChild(card);
+}
+
+// ---------------- Departments (Admin) ----------------
+function renderDepartments(main){
+  pageHeader(main,"Departments","Organize teams, assign managers, and set each department's shared login password", `<button class="btn btn-brass" id="add-dept">Add Department</button>`);
+  main.querySelector("#add-dept").addEventListener("click",()=>{ modal={type:"dept-form"}; render(); });
+  const card = el(`<div class="card"></div>`);
+  const t = el(`<table><thead><tr><th>Department</th><th>Manager</th><th>Employees</th><th>Shared password</th><th></th></tr></thead><tbody></tbody></table>`);
+  const tbody = t.querySelector("tbody");
+  state.departments.forEach(d=>{
+    const mgr = d.managerId ? empById(d.managerId) : null;
+    const count = state.employees.filter(e=>e.deptId===d.id).length;
+    const row = el(`<tr><td>${d.name}</td><td>${mgr?mgr.name:"—"}</td><td>${count}</td><td><code>${d.password||"—"}</code></td><td><button class="btn btn-sm" data-a="pw">Change password</button></td></tr>`);
+    row.querySelector('[data-a="pw"]').addEventListener("click",()=>{ modal={type:"dept-password",dept:d}; render(); });
+    tbody.appendChild(row);
+  });
+  card.appendChild(t);
+  main.appendChild(card);
+}
+
+// ---------------- Shifts (Admin) ----------------
+function renderShifts(main){
+  pageHeader(main,"Shifts","Configure shift timings and grace period", `<button class="btn btn-brass" id="add-shift">Add Shift</button>`);
+  main.querySelector("#add-shift").addEventListener("click",()=>{ modal={type:"shift-form"}; render(); });
+  const card = el(`<div class="card"></div>`);
+  const t = el(`<table><thead><tr><th>Shift</th><th>Start</th><th>End</th><th>Grace Period</th><th>Assigned</th></tr></thead><tbody></tbody></table>`);
+  const tbody = t.querySelector("tbody");
+  state.shifts.forEach(s=>{
+    const count = state.employees.filter(e=>e.shiftId===s.id).length;
+    tbody.appendChild(el(`<tr><td>${s.name}</td><td>${niceTime(s.start)}</td><td>${niceTime(s.end)}</td><td>${s.grace} min</td><td>${count} employees</td></tr>`));
+  });
+  card.appendChild(t);
+  main.appendChild(card);
+}
+
+// ---------------- Audit Logs (Admin) ----------------
+function renderAudit(main){
+  pageHeader(main,"Audit Logs","Full history of attendance changes and approvals",
+    Object.keys(state.locks).some(d=>state.locks[d]) ? "" : "");
+  const lockCard = el(`<div class="card" style="margin-bottom:14px;">
+    <div class="section-title">Attendance locking</div>
+    <div class="filters">
+      <input type="date" id="lock-date" value="${todayStr()}">
+      <button class="btn btn-sm" id="lock-toggle">Toggle Lock</button>
+    </div>
+    <div style="font-size:12.5px;color:var(--muted);">Locked dates: ${Object.keys(state.locks).filter(d=>state.locks[d]).join(", ")||"none"}</div>
+  </div>`);
+  main.appendChild(lockCard);
+  lockCard.querySelector("#lock-toggle").addEventListener("click",()=>{
+    const d = lockCard.querySelector("#lock-date").value;
+    toggleLock(d);
+  });
+
+  const card = el(`<div class="card"></div>`);
+  if(state.auditLogs.length===0){ card.appendChild(el(`<div class="empty">No audit activity yet.</div>`)); }
+  else {
+    const t = el(`<table><thead><tr><th>User</th><th>Action</th><th>Employee</th><th>Old</th><th>New</th><th>Reason</th><th>When</th></tr></thead><tbody></tbody></table>`);
+    const tbody = t.querySelector("tbody");
+    state.auditLogs.slice(0,100).forEach(a=>{
+      const e = a.empId?empById(a.empId):null;
+      tbody.appendChild(el(`<tr><td>${a.user}</td><td>${a.action}</td><td>${e?e.name:(a.newValue&&!e?a.newValue:"—")}</td><td>${a.oldValue}</td><td>${a.newValue}</td><td>${a.reason}</td><td>${new Date(a.date).toLocaleString()}</td></tr>`));
+    });
+    card.appendChild(t);
+  }
+  main.appendChild(card);
+}
+
+// ---------------- Notifications ----------------
+function renderNotifications(main){
+  pageHeader(main,"Notifications","Recent system activity");
+  const card = el(`<div class="card"></div>`);
+  if(state.notifications.length===0){ card.appendChild(el(`<div class="empty">No notifications yet.</div>`)); }
+  else {
+    state.notifications.slice(0,40).forEach(n=>{
+      card.appendChild(el(`<div style="padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;"><div>${n.text}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${new Date(n.at).toLocaleString()}</div></div>`));
+    });
+  }
+  main.appendChild(card);
+}
+
+// ---------------- Modal ----------------
+function renderModal(){
+  const bg = el(`<div class="modal-bg"></div>`);
+  bg.addEventListener("click",e=>{ if(e.target===bg){ modal=null; render(); } });
+  const box = el(`<div class="modal"></div>`);
+  bg.appendChild(box);
+
+  if(modal.type==="edit-attendance"){
+    const r = modal.rec; const e = empById(r.empId);
+    box.innerHTML = `<h3>Edit attendance — ${e.name}</h3>`;
+    box.appendChild(el(`<div class="field"><label>Date</label><input type="text" value="${r.date}" disabled></div>`));
+    const statusSel = el(`<div class="field"><label>Status</label><select id="m-status">${STATUSES.map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${STATUS_LABEL[s]}</option>`).join("")}</select></div>`);
+    box.appendChild(statusSel);
+    box.appendChild(el(`<div class="field"><label>Check In</label><input type="time" id="m-in" value="${r.checkIn||""}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Check Out</label><input type="time" id="m-out" value="${r.checkOut||""}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Edit reason (required)</label><textarea id="m-reason" rows="2" placeholder="e.g. Incorrect check-in time entered."></textarea></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Save</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const ok = await saveAttendanceEdit(r.empId,r.date, box.querySelector("#m-status").value, box.querySelector("#m-in").value, box.querySelector("#m-out").value, box.querySelector("#m-reason").value);
+      if(ok){ modal=null; render(); } else { render(); }
+    });
+  }
+
+  if(modal.type==="apply-leave"){
+    box.innerHTML = `<h3>Apply for leave</h3>`;
+    box.appendChild(el(`<div class="field"><label>Leave type</label><select id="l-type">${LEAVE_TYPES.map(t=>`<option>${t}</option>`).join("")}</select></div>`));
+    box.appendChild(el(`<div class="field"><label>From</label><input type="date" id="l-from" value="${todayStr()}"></div>`));
+    box.appendChild(el(`<div class="field"><label>To</label><input type="date" id="l-to" value="${todayStr()}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Reason</label><textarea id="l-reason" rows="2"></textarea></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Submit</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      await applyLeave(currentUser.id, box.querySelector("#l-type").value, box.querySelector("#l-from").value, box.querySelector("#l-to").value, box.querySelector("#l-reason").value);
+      modal=null;
+    });
+  }
+
+  if(modal.type==="request-correction"){
+    box.innerHTML = `<h3>Request attendance correction</h3>`;
+    box.appendChild(el(`<div class="field"><label>Date</label><input type="date" id="c-date" value="${todayStr()}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Requested check-in time</label><input type="time" id="c-in"></div>`));
+    box.appendChild(el(`<div class="field"><label>Reason</label><textarea id="c-reason" rows="2" placeholder="e.g. Forgot to punch attendance"></textarea></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Submit</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const date = box.querySelector("#c-date").value;
+      const rec = attendanceFor(currentUser.id,date);
+      await requestCorrection(currentUser.id,date, rec?rec.checkIn:null, box.querySelector("#c-in").value, box.querySelector("#c-reason").value);
+      modal=null;
+    });
+  }
+
+  if(modal.type==="employee-form"){
+    const isEdit = !!modal.emp;
+    const emp = modal.emp || {id:"",name:"",mobile:"",deptId:state.departments[0].id,designation:"",role:"EMPLOYEE",managerId:"",shiftId:state.shifts[0].id,joined:todayStr(),password:""};
+    box.innerHTML = `<h3>${isEdit?"Edit":"Add"} employee</h3>`;
+    box.appendChild(el(`<div class="field"><label>Employee ID (Login ID)</label><input id="e-id" value="${emp.id}" ${isEdit?"disabled":""} placeholder="e.g. E9"></div>`));
+    box.appendChild(el(`<div class="field"><label>Name</label><input id="e-name" value="${emp.name}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Mobile</label><input id="e-mobile" value="${emp.mobile}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Department</label><select id="e-dept">${state.departments.map(d=>`<option value="${d.id}" ${emp.deptId===d.id?'selected':''}>${d.name}</option>`).join("")}</select></div>`));
+    box.appendChild(el(`<div class="field"><label>Designation</label><input id="e-desig" value="${emp.designation}"></div>`));
+    box.appendChild(el(`<div class="field"><label>Role</label><select id="e-role">${["EMPLOYEE","MANAGER","ADMIN"].map(r=>`<option value="${r}" ${emp.role===r?'selected':''}>${r}</option>`).join("")}</select></div>`));
+    box.appendChild(el(`<div class="field"><label>Shift</label><select id="e-shift">${state.shifts.map(s=>`<option value="${s.id}" ${emp.shiftId===s.id?'selected':''}>${s.name}</option>`).join("")}</select></div>`));
+    box.appendChild(el(`<div class="field"><label>Joining date</label><input type="date" id="e-joined" value="${emp.joined}"></div>`));
+    if(!isEdit){
+      box.appendChild(el(`<div class="field"><label>Individual password (optional)</label><input id="e-pw" placeholder="Leave blank to use the department's shared password"></div>`));
+    }
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">${isEdit?"Save":"Add"}</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const data = {
+        name:box.querySelector("#e-name").value.trim(),
+        mobile:box.querySelector("#e-mobile").value.trim(),
+        deptId:box.querySelector("#e-dept").value,
+        designation:box.querySelector("#e-desig").value.trim(),
+        role:box.querySelector("#e-role").value,
+        shiftId:box.querySelector("#e-shift").value,
+        joined:box.querySelector("#e-joined").value,
+        managerId: emp.managerId||null,
+      };
+      if(!data.name){ showToast("Please provide required fields."); render(); return; }
+      if(isEdit){
+        await updateEmployee(emp.id,data);
+      } else {
+        const newId = box.querySelector("#e-id").value.trim();
+        if(!newId){ showToast("Please provide an Employee ID."); render(); return; }
+        if(empById(newId)){ showToast("That Employee ID is already in use."); render(); return; }
+        data.password = box.querySelector("#e-pw").value.trim() || null;
+        await addEmployee(data,newId);
+      }
+      modal=null;
+    });
+  }
+
+  if(modal.type==="dept-form"){
+    box.innerHTML = `<h3>Add department</h3>`;
+    box.appendChild(el(`<div class="field"><label>Name</label><input id="d-name"></div>`));
+    box.appendChild(el(`<div class="field"><label>Manager</label><select id="d-mgr"><option value="">—</option>${state.employees.filter(e=>e.role==="MANAGER"||e.role==="ADMIN").map(e=>`<option value="${e.id}">${e.name}</option>`).join("")}</select></div>`));
+    box.appendChild(el(`<div class="field"><label>Shared login password for this department</label><input id="d-pw" placeholder="e.g. Sales@123"></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Add</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const name = box.querySelector("#d-name").value.trim();
+      const pw = box.querySelector("#d-pw").value.trim();
+      if(!name || !pw){ showToast("Please provide required fields."); render(); return; }
+      await addDepartment(name, box.querySelector("#d-mgr").value||null, pw);
+      modal=null;
+    });
+  }
+
+  if(modal.type==="dept-password"){
+    const d = modal.dept;
+    box.innerHTML = `<h3>Change password — ${d.name}</h3>`;
+    box.appendChild(el(`<div class="field"><label>New shared password</label><input id="dp-pw" value="${d.password||""}"></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Save</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const pw = box.querySelector("#dp-pw").value.trim();
+      if(!pw){ showToast("Please provide a password."); render(); return; }
+      d.password = pw;
+      log(currentUser,"DEPT_PASSWORD_CHANGE",d.id,"",d.name,"");
+      await saveState();
+      showToast("Password updated for "+d.name+".");
+      modal=null;
+      render();
+    });
+  }
+
+  if(modal.type==="emp-password"){
+    const e = modal.emp;
+    const dept = deptById(e.deptId);
+    box.innerHTML = `<h3>Change password — ${e.name}</h3>`;
+    box.appendChild(el(`<div class="field"><label>Individual password</label><input id="ep-pw" value="${e.password||""}" placeholder="Leave blank to use the department's shared password (${dept?dept.password:'—'})"></div>`));
+    const actions = el(`<div class="modal-actions">${e.password?'<button class="btn btn-danger" id="m-clear">Use department password</button>':''}<button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Save</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    const clearBtn = box.querySelector("#m-clear");
+    if(clearBtn) clearBtn.addEventListener("click", async ()=>{
+      e.password = null;
+      log(currentUser,"EMP_PASSWORD_RESET",e.id,"","cleared — using department password","");
+      await saveState();
+      showToast(e.name+" now uses the department's shared password.");
+      modal=null; render();
+    });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const pw = box.querySelector("#ep-pw").value.trim();
+      if(!pw){ showToast("Please provide a password, or use \"Use department password\" instead."); render(); return; }
+      e.password = pw;
+      log(currentUser,"EMP_PASSWORD_CHANGE",e.id,"","individual password set","");
+      await saveState();
+      showToast("Password updated for "+e.name+".");
+      modal=null;
+      render();
+    });
+  }
+
+  if(modal.type==="shift-form"){
+    box.innerHTML = `<h3>Add shift</h3>`;
+    box.appendChild(el(`<div class="field"><label>Name</label><input id="s-name"></div>`));
+    box.appendChild(el(`<div class="field"><label>Start</label><input type="time" id="s-start" value="09:00"></div>`));
+    box.appendChild(el(`<div class="field"><label>End</label><input type="time" id="s-end" value="18:00"></div>`));
+    box.appendChild(el(`<div class="field"><label>Grace period (minutes)</label><input type="number" id="s-grace" value="15"></div>`));
+    const actions = el(`<div class="modal-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn btn-primary" id="m-save">Add</button></div>`);
+    box.appendChild(actions);
+    box.querySelector("#m-cancel").addEventListener("click",()=>{ modal=null; render(); });
+    box.querySelector("#m-save").addEventListener("click", async ()=>{
+      const name = box.querySelector("#s-name").value.trim();
+      if(!name){ showToast("Please provide required fields."); render(); return; }
+      await addShift(name, box.querySelector("#s-start").value, box.querySelector("#s-end").value, box.querySelector("#s-grace").value);
+      modal=null;
+    });
+  }
+
+  document.body.appendChild(bg); // ensure overlay above artifact container too
+  root.appendChild(bg);
+}
+
+// ---------------- Main render ----------------
+function render(){
+  if(!currentUser){ renderLogin(); return; }
+  renderShell(main=>{
+    if(currentView==="dashboard") renderDashboard(main);
+    else if(currentView==="attendance") renderAttendance(main);
+    else if(currentView==="calendar") renderCalendar(main);
+    else if(currentView==="leaves") renderLeaves(main);
+    else if(currentView==="corrections") renderCorrections(main);
+    else if(currentView==="reports") renderReports(main);
+    else if(currentView==="employees") renderEmployees(main);
+    else if(currentView==="departments") renderDepartments(main);
+    else if(currentView==="shifts") renderShifts(main);
+    else if(currentView==="audit") renderAudit(main);
+    else if(currentView==="notifications") renderNotifications(main);
+    else renderDashboard(main);
+  });
+}
+
+(async function init(){
+  root.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:600px;color:#6B7268;font-size:13px;">Loading…</div>`;
+  await loadState();
+  render();
+})();
+
+})();
+</script>
